@@ -33,6 +33,8 @@ dependencies:
   web: ^1.1.1
   google_generative_ai: ^0.4.7
   google_fonts: ^8.0.2
+  supabase_flutter: ^2.8.2
+
 
 dev_dependencies:
   flutter_test:

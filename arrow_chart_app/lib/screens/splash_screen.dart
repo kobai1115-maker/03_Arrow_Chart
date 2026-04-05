@@ -1,16 +1,20 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../providers/auth_provider.dart';
+import 'auth/login_screen.dart';
 import 'project_list_screen.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProviderStateMixin {
   late AnimationController _backgroundController;
   late AnimationController _fadeController;
   late Animation<double> _creditOpacity;
@@ -61,17 +65,24 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
     // ホーム画面へ遷移 (5秒後)
     Future.delayed(const Duration(milliseconds: 5000), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 1200),
-            pageBuilder: (context, animation, secondaryAnimation) => const ProjectListScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-          ),
-        );
-      }
+      if (!mounted) return;
+      
+      final authState = ref.read(authProvider);
+      
+      // ユーザーがいない場合はログイン画面、いる場合はリスト画面へ
+      final Widget nextScreen = authState.user == null 
+          ? const LoginScreen() 
+          : const ProjectListScreen();
+
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 1200),
+          pageBuilder: (context, animation, secondaryAnimation) => nextScreen,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      );
     });
   }
 

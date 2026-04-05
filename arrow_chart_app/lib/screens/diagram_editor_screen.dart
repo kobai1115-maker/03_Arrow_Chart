@@ -7,6 +7,7 @@ import '../models/diagram_model.dart';
 import '../models/node_model.dart';
 import '../models/edge_model.dart';
 import '../providers/diagram_provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/connection_provider.dart';
 import '../services/goal_extraction_service.dart';
 import '../widgets/canvas/subjective_node.dart';
@@ -606,9 +607,14 @@ class _DiagramEditorScreenState extends ConsumerState<DiagramEditorScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('キャンセル')),
           TextButton(
-            onPressed: () {
-              ref.read(diagramProvider.notifier).newDiagram();
-              Navigator.pop(context);
+            onPressed: () async {
+              final success = await ref.read(diagramProvider.notifier).newDiagram();
+              if (mounted) {
+                 Navigator.pop(context);
+                 if (!success) {
+                   _showPremiumDialog(context);
+                 }
+              }
             },
             child: const Text('新規作成', style: TextStyle(color: Colors.red)),
           ),
@@ -697,8 +703,43 @@ class _DiagramEditorScreenState extends ConsumerState<DiagramEditorScreen> {
         .addNode(type, position.dx - 70, position.dy - 40);
   }
 
+  /// プレミアム機能制限ダイアログ
+  void _showPremiumDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.star, color: Colors.amber),
+            SizedBox(width: 10),
+            Text('プレミアム機能'),
+          ],
+        ),
+        content: const Text('AIによる目標抽出およびケアプラン提案はプレミアムプラン専用の機能です。\n\nアップグレードすると、AIアシスタントがあなたのケアプラン作成を強力にサポートします。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('キャンセル'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Scaffold.of(context).openDrawer(); // Drawerからアップグレードへ誘導
+            },
+            child: const Text('プランを確認'),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// 目標候補を抽出して表示 (旧仕様)
   void _showGoalSuggestions(BuildContext context) {
+    if (!ref.read(authProvider).isPremium) {
+      _showPremiumDialog(context);
+      return;
+    }
+
     final diagram = ref.read(diagramProvider);
     final candidates = _goalService.extractGoals(diagram);
 
@@ -712,6 +753,11 @@ class _DiagramEditorScreenState extends ConsumerState<DiagramEditorScreen> {
 
   /// AIケアプラン提案の生成フロー
   void _generateCarePlan() async {
+    if (!ref.read(authProvider).isPremium) {
+      _showPremiumDialog(context);
+      return;
+    }
+
     final diagram = ref.read(diagramProvider);
     final candidates = _goalService.extractGoals(diagram);
 

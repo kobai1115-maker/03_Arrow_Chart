@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/diagram_provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/app_drawer.dart';
 import 'diagram_editor_screen.dart';
 import 'settings_screen.dart';
-import 'splash_screen.dart';
 
 class ProjectListScreen extends ConsumerStatefulWidget {
   const ProjectListScreen({super.key});
@@ -15,13 +15,47 @@ class ProjectListScreen extends ConsumerStatefulWidget {
 
 class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
   Future<void> _createNewDiagram() async {
-    ref.read(diagramProvider.notifier).newDiagram();
+    final success = await ref.read(diagramProvider.notifier).newDiagram();
+    if (!success && mounted) {
+      _showPremiumDialog();
+      return;
+    }
+
     if (mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const DiagramEditorScreen()),
       );
     }
+  }
+
+  void _showPremiumDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.star, color: Colors.amber),
+            SizedBox(width: 10),
+            Text('プレミアム機能'),
+          ],
+        ),
+        content: const Text('フリープランでの作成上限（3枚）に達しました。\n\nプレミアムプランにアップグレードすると、保存枚数が無制限になり、AI機能も使い放題になります。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('キャンセル'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Scaffold.of(context).openDrawer(); // Drawerからアップグレードへ誘導
+            },
+            child: const Text('プランを確認'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _loadDiagram(String id) async {
@@ -38,11 +72,22 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
   @override
   Widget build(BuildContext context) {
     final projectListAsync = ref.watch(projectListProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('プロジェクト一覧'),
         actions: [
+          if (!authState.isPremium)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Text(
+                  '保存済み: ${projectListAsync.valueOrNull?.length ?? 0} / 3',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.orange),
+                ),
+              ),
+            ),
           IconButton(
             onPressed: () => Navigator.push(
               context,
@@ -156,13 +201,11 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(child: Text('エラーが発生しました: $error')),
       ),
-      floatingActionButton: (projectListAsync.valueOrNull?.isEmpty ?? true)
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: _createNewDiagram,
-              icon: const Icon(Icons.add),
-              label: const Text('新規作成'),
-            ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _createNewDiagram,
+        icon: const Icon(Icons.add),
+        label: const Text('新規作成'),
+      ),
     );
   }
 

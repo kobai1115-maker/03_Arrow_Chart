@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'goal_extraction_service.dart';
+import 'supabase_service.dart';
 import '../data/care_knowledge.dart';
 
 class CarePlanProposal {
@@ -24,6 +25,7 @@ class CarePlanProposal {
 /// Gemini API を使った目標文リライトサービス
 class LlmService {
   final String? apiKey;
+  final SupabaseService _supabase = SupabaseService();
 
   LlmService({this.apiKey});
 
@@ -244,16 +246,39 @@ ${loopTexts.map((e) => '- $e').join('\n')}
 
   /// Gemini API呼び出し (google_generative_aiを使用)
   Future<String> _callGemini(String prompt, {bool expectJson = false, String? systemInstruction}) async {
+    // ログイン済みかつプレミアムならEdge Functionを優先的に試行する（キーを隠蔽するため）
+    final user = _supabase.currentUser;
+    if (user != null) {
+      try {
+        final response = await _supabase.client.functions.invoke(
+          'generate-care-plan',
+          body: {
+            'prompt': prompt,
+            'systemInstruction': systemInstruction,
+            'expectJson': expectJson,
+          },
+        );
+        
+        if (response.status == 200) {
+          final data = response.data;
+          return data['text'] ?? '';
+        }
+      } catch (e) {
+        print('Edge Function Error, falling back to local: $e');
+      }
+    }
+
+    // fallback: クライアント側のSDKを使用 (開発用または個人用キー設定時)
     if (apiKey == null || apiKey!.isEmpty) {
       throw Exception('API Key is not set');
     }
 
     final model = GenerativeModel(
-      model: 'gemini-2.5-flash', // 最新のモデル指定、2.0-flashでも可
+      model: 'gemini-2.0-flash',
       apiKey: apiKey!,
       systemInstruction: systemInstruction != null ? Content.system(systemInstruction) : null,
       generationConfig: GenerationConfig(
-        temperature: 0.2, // 確実性を高める
+        temperature: 0.2,
         responseMimeType: expectJson ? 'application/json' : 'text/plain',
       ),
     );
