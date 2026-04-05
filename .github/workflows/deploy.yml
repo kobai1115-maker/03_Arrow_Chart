@@ -3,10 +3,9 @@ name: 関係性ダイアグラム — GitHub Pages 自動デプロイ
 on:
   push:
     branches:
-      - master        # masterブランチにプッシュしたら自動実行
-  workflow_dispatch: # GitHubのWebサイトから手動実行も可能
+      - master
+  workflow_dispatch:
 
-# GitHub Pages へのデプロイに必要な権限設定
 permissions:
   contents: read
   pages: write
@@ -14,44 +13,38 @@ permissions:
 
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest   # GitHubのサーバー（Linux）で実行
-    
-    # 全ステップのデフォルト作業ディレクトリを arrow_chart_app に設定
-    defaults:
-      run:
-        working-directory: arrow_chart_app
-
+    runs-on: ubuntu-latest
     steps:
-      # ステップ1: リポジトリのコードを取得
       - name: リポジトリをチェックアウト
         uses: actions/checkout@v4
 
-      # ステップ2: Flutterをセットアップ
+      - name: フォルダ構造の確認（デバッグ用）
+        run: |
+          echo "Checking directory structure..."
+          ls -la
+          pwd
+
       - name: Flutter をセットアップ
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'  # 安定版を使用
+          channel: 'stable'
 
-      # ステップ3: 依存パッケージを取得
       - name: パッケージを取得
+        working-directory: arrow_chart_app
         run: flutter pub get
 
-      # ステップ4: Webアプリとしてビルド
       - name: Webアプリをビルド
+        working-directory: arrow_chart_app
         run: flutter build web --release --wasm --tree-shake-icons --base-href "/03_Arrow_Chart/"
 
-      # ステップ5: GitHub Pages の設定
       - name: GitHub Pages の設定
         uses: actions/configure-pages@v4
 
-      # ステップ6: ビルド結果をアップロード
       - name: ビルド成果物をアップロード
         uses: actions/upload-pages-artifact@v3
         with:
-          # パスはリポジトリのルートからの相対パス（ここはworking-directoryの影響を受けません）
           path: './arrow_chart_app/build/web'
 
-      # ステップ7: GitHub Pages にデプロイ
       - name: GitHub Pages にデプロイ
         id: deployment
         uses: actions/deploy-pages@v4
