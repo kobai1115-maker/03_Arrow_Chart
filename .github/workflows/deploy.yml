@@ -15,10 +15,19 @@ permissions:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest   # GitHubのサーバー（Linux）で実行
+    
+    # すべてのrunステップのベースディレクトリを arrow_chart_app に設定
+    defaults:
+      run:
+        working-directory: arrow_chart_app
+
     steps:
       # ステップ1: リポジトリのコードを取得
       - name: リポジトリをチェックアウト
         uses: actions/checkout@v4
+        with:
+          # リポジトリ全体をチェックアウト（サブディレクトリも含む）
+          sparse-checkout: .
 
       # ステップ2: Flutterをセットアップ
       - name: Flutter をセットアップ
@@ -43,7 +52,8 @@ jobs:
       - name: ビルド成果物をアップロード
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './build/web'   # ビルド出力フォルダ
+          # パスはリポジトリのルートからの相対パス
+          path: './arrow_chart_app/build/web'
 
       # ステップ7: GitHub Pages にデプロイ
       - name: GitHub Pages にデプロイ
