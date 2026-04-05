@@ -227,9 +227,25 @@ nav {
 
 /* Footer */
 footer {
-    padding: 40px 0;
+    padding: 60px 0;
     border-top: 1px solid #e2e8f0;
     text-align: center;
+    background: #f8fafc;
+}
+
+.credits {
+    margin-bottom: 24px;
+}
+
+.credits p {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.copyright {
+    font-size: 0.85rem;
     color: var(--text-muted);
 }
 
