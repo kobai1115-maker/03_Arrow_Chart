@@ -46,7 +46,18 @@ jobs:
 
       - name: Webアプリをビルド
         working-directory: arrow_chart_app
-        run: flutter build web --release --wasm --tree-shake-icons --base-href "/03_Arrow_Chart/"
+        run: flutter build web --release --wasm --tree-shake-icons --base-href "/03_Arrow_Chart/app/"
+
+      - name: 公開用フォルダの準備と統合
+        run: |
+          mkdir -p dist/app
+          # LP ファイルをルートにコピー
+          cp landing/index.html dist/
+          cp landing/style.css dist/
+          cp landing/script.js dist/
+          cp landing/hero.png dist/
+          # Flutter ビルド成果物を /app にコピー
+          cp -r arrow_chart_app/build/web/* dist/app/
 
       - name: GitHub Pages の設定
         uses: actions/configure-pages@v4
@@ -54,7 +65,7 @@ jobs:
       - name: ビルド成果物をアップロード
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './arrow_chart_app/build/web'
+          path: './dist'
 
       - name: GitHub Pages にデプロイ
         id: deployment
