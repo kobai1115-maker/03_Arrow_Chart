@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/settings_service.dart';
+import '../providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -44,6 +45,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final isDeveloper = authState.role == 'developer' || authState.role == 'admin';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('設定'),
@@ -51,29 +55,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text(
-            'AI目標提案の設定',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Gemini APIキーを入力してください。目標文の自動リライト機能に使用されます。',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _apiKeyController,
-            decoration: const InputDecoration(
-              labelText: 'Gemini API Key',
-              hintText: 'AIza...',
-              border: OutlineInputBorder(),
-              floatingLabelBehavior: FloatingLabelBehavior.always,
+          if (isDeveloper) ...[
+            const Text(
+              'AI目標提案の設定',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            obscureText: true,
-          ),
-          const SizedBox(height: 24),
-          const Divider(),
-          const SizedBox(height: 20),
+            const SizedBox(height: 16),
+            const Text(
+              'Gemini APIキーを入力してください。目標文の自動リライト機能に使用されます。',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _apiKeyController,
+              decoration: const InputDecoration(
+                labelText: 'Gemini API Key',
+                hintText: 'AIza...',
+                border: OutlineInputBorder(),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: _saveApiKey,
+              icon: const Icon(Icons.save),
+              label: const Text('APIキーを保存して戻る'),
+            ),
+            const SizedBox(height: 40),
+            const Divider(),
+            const SizedBox(height: 20),
+          ],
           const Text(
             '操作設定',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -91,12 +103,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               await ref.read(enterToSubmitProvider.notifier).setEnterToSubmit(value);
             },
             activeColor: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: _saveApiKey,
-            icon: const Icon(Icons.save),
-            label: const Text('APIキーを保存して戻る'),
           ),
           const SizedBox(height: 40),
           const Divider(),

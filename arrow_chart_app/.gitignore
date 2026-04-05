@@ -20,3 +20,6 @@ Desktop.ini
 # 圧縮ファイル（リポジトリを軽くするため）
 *.zip
 noto_extracted/
+
+# Security Data
+lib/constants/supabase_constants.dart

@@ -33,6 +33,17 @@ jobs:
         working-directory: arrow_chart_app
         run: flutter pub get
 
+      - name: SecretsからAPIキーを生成
+        working-directory: arrow_chart_app
+        run: |
+          mkdir -p lib/constants
+          cat << EOF > lib/constants/supabase_constants.dart
+          class SupabaseConstants {
+            static const String url = '${{ secrets.SUPABASE_URL }}';
+            static const String anonKey = '${{ secrets.SUPABASE_ANON_KEY }}';
+          }
+          EOF
+
       - name: Webアプリをビルド
         working-directory: arrow_chart_app
         run: flutter build web --release --wasm --tree-shake-icons --base-href "/03_Arrow_Chart/"

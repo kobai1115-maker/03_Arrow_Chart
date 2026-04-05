@@ -6,12 +6,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class AppAuthState {
   final User? user;
   final bool isPremium;
+  final String role;
   final bool isLoading;
   final String? errorMessage;
 
   AppAuthState({
     this.user,
     this.isPremium = false,
+    this.role = 'user',
     this.isLoading = false,
     this.errorMessage,
   });
@@ -19,12 +21,14 @@ class AppAuthState {
   AppAuthState copyWith({
     User? user,
     bool? isPremium,
+    String? role,
     bool? isLoading,
     String? errorMessage,
   }) {
     return AppAuthState(
       user: user ?? this.user,
       isPremium: isPremium ?? this.isPremium,
+      role: role ?? this.role,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
     );
@@ -64,18 +68,26 @@ class AuthNotifier extends StateNotifier<AppAuthState> {
     });
   }
 
-  /// プレミアムステータスを非同期で更新
+  /// プレミアムステータスおよびロールを非同期で更新
   Future<void> _updatePremiumStatus(String userId) async {
     try {
-      // タイムアウトを設定して、DBが遅くても3秒で切り上げる
-      final isPremium = await _supabase.isPremium(userId).timeout(
+      // プロファイル情報をタイムアウト付きで取得
+      final profile = await _supabase.getUserProfile(userId).timeout(
         const Duration(seconds: 3),
-        onTimeout: () => false,
+        onTimeout: () => null,
       );
-      state = state.copyWith(isPremium: isPremium);
+
+      if (profile != null) {
+        state = state.copyWith(
+          isPremium: profile['is_premium'] == true,
+          role: profile['role'] as String? ?? 'user',
+        );
+      } else {
+        state = state.copyWith(isPremium: false, role: 'user');
+      }
     } catch (_) {
-      // 失敗しても無料会員として続行
-      state = state.copyWith(isPremium: false);
+      // 失敗しても一般会員として続行
+      state = state.copyWith(isPremium: false, role: 'user');
     }
   }
 
