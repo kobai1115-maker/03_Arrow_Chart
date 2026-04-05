@@ -82,7 +82,7 @@ class _DiagramEditorScreenState extends ConsumerState<DiagramEditorScreen> {
       final node = ref.read(diagramProvider).findNode(_selectedNodeId!);
       if (node != null) {
         final nodeJson = jsonEncode(node.toJson());
-        Clipboard.setData(ClipboardData(text: 'ArrowChartNode:$nodeJson'));
+        Clipboard.setData(ClipboardData(text: 'RelDiagramNode:$nodeJson'));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ノードをコピーしました'), duration: Duration(seconds: 1)),
         );
@@ -92,8 +92,8 @@ class _DiagramEditorScreenState extends ConsumerState<DiagramEditorScreen> {
 
   void _paste() async {
     final data = await Clipboard.getData('text/plain');
-    if (data != null && data.text != null && data.text!.startsWith('ArrowChartNode:')) {
-      final jsonStr = data.text!.substring('ArrowChartNode:'.length);
+    if (data != null && data.text != null && data.text!.startsWith('RelDiagramNode:')) {
+      final jsonStr = data.text!.substring('RelDiagramNode:'.length);
       try {
         final nodeJson = jsonDecode(jsonStr);
         final oldNode = ChartNode.fromJson(nodeJson);

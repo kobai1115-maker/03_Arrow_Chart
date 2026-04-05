@@ -146,7 +146,7 @@ class ExportService {
       final bytes = Uint8List.fromList(utf8.encode(jsonString));
       await file_helper.saveAndShareFile(
         title,
-        'arrow',
+        'rel',
         bytes,
         'application/json',
         '関係性ダイアグラム プロジェクト: $title',
