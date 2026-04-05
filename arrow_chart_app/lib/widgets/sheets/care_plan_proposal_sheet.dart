@@ -130,7 +130,8 @@ class CarePlanProposalSheet extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                         ],
-                        PdfSectionBlock(
+                        _buildSection(
+                          icon: Icons.list_alt,
                           title: 'ケア指針 (アセスメント項目)',
                           content: proposal.careGuidelines,
                           color: const Color(0xFFF28FAD), // ピンク系

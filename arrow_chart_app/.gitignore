@@ -1,1 +1,22 @@
-git add .
+# Flutter/Dart
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# IDEの設定ファイル
+.idea/
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# 一時ファイル
+*.tmp
+*.log
+
+# 圧縮ファイル（リポジトリを軽くするため）
+*.zip
+noto_extracted/

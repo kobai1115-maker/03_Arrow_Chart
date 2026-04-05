@@ -1,5 +1,5 @@
 name: arrow_chart_app
-description: "アローチャート描画＆ケアプラン目標提案アプリ"
+description: "関係性ダイアグラム描画＆ケアプラン目標提案アプリ"
 publish_to: 'none'
 version: 1.0.0+1
 

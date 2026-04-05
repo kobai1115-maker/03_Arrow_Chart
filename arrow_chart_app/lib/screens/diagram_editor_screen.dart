@@ -26,7 +26,7 @@ import '../shortcuts/canvas_intents.dart';
 import '../utils/shortcut_utils.dart';
 import '../widgets/app_drawer.dart';
 
-/// アローチャートエディタ画面
+/// 関係性ダイアグラムエディタ画面
 class DiagramEditorScreen extends ConsumerStatefulWidget {
   const DiagramEditorScreen({super.key});
 
@@ -194,7 +194,7 @@ class _DiagramEditorScreenState extends ConsumerState<DiagramEditorScreen> {
               const PopupMenuItem(value: 'export_img', child: Text('画像(PNG)で書き出し')),
               const PopupMenuItem(value: 'export_pdf', child: Text('PDFで書き出し')),
               const PopupMenuDivider(),
-              const PopupMenuItem(value: 'export_json', child: Text('プロジェクトを保存(.arrow)')),
+              const PopupMenuItem(value: 'export_json', child: Text('プロジェクトを保存(.rel)')),
               const PopupMenuItem(value: 'import_json', child: Text('プロジェクトを読込')),
               const PopupMenuDivider(),
               const PopupMenuItem(value: 'settings', child: Text('設定 (APIキー)')),
@@ -777,7 +777,7 @@ class _DiagramEditorScreenState extends ConsumerState<DiagramEditorScreen> {
           controller: controller,
           autofocus: true,
           decoration: const InputDecoration(
-            hintText: 'アローチャートのタイトル',
+            hintText: '関係性ダイアグラムのタイトル',
           ),
         ),
         actions: [

@@ -26,7 +26,7 @@ class AppDrawer extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                'アローチャート',
+                '関係性ダイアグラム',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,

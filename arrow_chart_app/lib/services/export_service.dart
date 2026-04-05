@@ -24,7 +24,7 @@ class ExportService {
         'png',
         imageBytes,
         'image/png',
-        'アローチャート: $title',
+        '関係性ダイアグラム: $title',
       );
 
       if (context.mounted) {
@@ -71,7 +71,7 @@ class ExportService {
             return [
               pw.Header(
                 level: 0,
-                child: pw.Text("アローチャート: $title", style: pw.TextStyle(font: ttfBold, fontSize: 24)),
+                child: pw.Text("関係性ダイアグラム: $title", style: pw.TextStyle(font: ttfBold, fontSize: 24)),
               ),
               pw.SizedBox(height: 10),
               pw.Container(
@@ -105,7 +105,7 @@ class ExportService {
         'pdf',
         pdfBytes,
         'application/pdf',
-        'アローチャート PDF: $title',
+        '関係性ダイアグラム PDF: $title',
       );
 
       if (context.mounted) {
@@ -149,7 +149,7 @@ class ExportService {
         'arrow',
         bytes,
         'application/json',
-        'アローチャート プロジェクト: $title',
+        '関係性ダイアグラム プロジェクト: $title',
       );
 
       if (context.mounted) {
@@ -166,7 +166,7 @@ class ExportService {
   Future<String?> importFromJson(BuildContext context) async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.any, // .arrowファイル または .json
+        type: FileType.any, // .relファイル または .json
         withData: true, // Webでbytesを取得するために必須
       );
 

@@ -1,12 +1,12 @@
-name: Deploy Flutter Web to GitHub Pages
+name: 関係性ダイアグラム — GitHub Pages 自動デプロイ
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch: # 手動実行を許可
+      - master        # masterブランチにプッシュしたら自動実行
+  workflow_dispatch: # GitHubのWebサイトから手動実行も可能
 
-# Permissions for deploying to GitHub Pages
+# GitHub Pages へのデプロイに必要な権限設定
 permissions:
   contents: read
   pages: write
@@ -14,32 +14,38 @@ permissions:
 
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   # GitHubのサーバー（Linux）で実行
     steps:
-      - name: Checkout repository
+      # ステップ1: リポジトリのコードを取得
+      - name: リポジトリをチェックアウト
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      # ステップ2: Flutterをセットアップ
+      - name: Flutter をセットアップ
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: 'stable'  # 安定版を使用
 
-      - name: Get dependencies
+      # ステップ3: 依存パッケージを取得
+      - name: パッケージを取得
         run: flutter pub get
 
-      - name: Build Web with Wasm
-        # Wasm(WebAssembly)向け最適化オプションをつけてビルド。
-        # base-href は GitHub Pages のリポジトリ名に適宜変更してください (例: "/repo-name/")
-        run: flutter build web --release --wasm --tree-shake-icons --base-href "/"
+      # ステップ4: Webアプリとしてビルド
+      # --base-href: GitHubのリポジトリ名に合わせた設定（重要！）
+      - name: Webアプリをビルド
+        run: flutter build web --release --wasm --tree-shake-icons --base-href "/03_Arrow_Chart/"
 
-      - name: Setup Pages
+      # ステップ5: GitHub Pages の設定
+      - name: GitHub Pages の設定
         uses: actions/configure-pages@v4
 
-      - name: Upload artifact
+      # ステップ6: ビルド結果をアップロード
+      - name: ビルド成果物をアップロード
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './build/web'
+          path: './build/web'   # ビルド出力フォルダ
 
-      - name: Deploy to GitHub Pages
+      # ステップ7: GitHub Pages にデプロイ
+      - name: GitHub Pages にデプロイ
         id: deployment
         uses: actions/deploy-pages@v4

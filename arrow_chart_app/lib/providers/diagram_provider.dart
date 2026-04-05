@@ -21,7 +21,7 @@ class DiagramNotifier extends StateNotifier<Diagram> {
 
   DiagramNotifier({DiagramRepository? repository})
       : _repository = repository,
-        super(Diagram(id: _uuid.v4(), title: '新規アローチャート'));
+        super(Diagram(id: _uuid.v4(), title: '新規関係性ダイアグラム'));
 
   /// 現在の状態を履歴に保存
   void _addToHistory() {
@@ -65,7 +65,7 @@ class DiagramNotifier extends StateNotifier<Diagram> {
   /// 新規ダイアグラムを初期化
   void newDiagram() {
     _addToHistory();
-    state = Diagram(id: _uuid.v4(), title: '新規アローチャート');
+    state = Diagram(id: _uuid.v4(), title: '新規関係性ダイアグラム');
     _save();
   }
 

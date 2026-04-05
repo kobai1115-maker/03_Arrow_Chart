@@ -1,6 +1,6 @@
 {
-    "name": "arrow_chart_app",
-    "short_name": "arrow_chart_app",
+    "name": "関係性ダイアグラム",
+    "short_name": "関係性ダイアグラム",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

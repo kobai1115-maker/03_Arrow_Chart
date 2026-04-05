@@ -443,7 +443,7 @@ class CreditWidget extends StatelessWidget {
         _buildCreditItem(
           'Methodology by',
           '吉島 豊録',
-          '(Toyoroku Yoshijima) - アローチャートメソッド考案・著作者',
+          '(Toyoroku Yoshijima) - 関係性ダイアグラムメソッド考案・著作者',
           isDrawer,
         ),
         SizedBox(height: isDrawer ? 16 : 24),
