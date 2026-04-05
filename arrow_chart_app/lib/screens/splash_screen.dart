@@ -148,6 +148,24 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    // タイトルのフェードイン（前半 0〜60%）
+    final titleOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+    // タイトルのスライドアップ
+    final titleSlide = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9FBFB), // 目に優しいクリーンな背景
       body: Stack(
@@ -180,7 +198,68 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             ),
           ),
 
-          // 前面：タイポグラフィ（クレジット表示）
+          // 中央：アプリタイトルのアニメーション表示
+          Center(
+            child: AnimatedBuilder(
+              animation: _fadeController,
+              builder: (context, child) {
+                return FadeTransition(
+                  opacity: titleOpacity,
+                  child: SlideTransition(
+                    position: titleSlide,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // アクセントライン（上）
+                        Container(
+                          width: 40,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF009688),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // メインタイトル
+                        Text(
+                          '関係性ダイアグラム',
+                          style: GoogleFonts.notoSansJp(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1A3C34),
+                            letterSpacing: 2.0,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        // サブタイトル（英語）
+                        Text(
+                          'Relationship Diagram',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF009688),
+                            letterSpacing: 3.5,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // アクセントライン（下）
+                        Container(
+                          width: 40,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF009688),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // 前面：クレジット表示（画面下部）
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
