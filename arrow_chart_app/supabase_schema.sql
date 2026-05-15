@@ -12,8 +12,8 @@ CREATE TABLE public.profiles (
 -- RLS設定
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Profiles are viewable by everyone" ON public.profiles
-  FOR SELECT USING (true);
+CREATE POLICY "Users can view their own profile" ON public.profiles
+  FOR SELECT USING (auth.uid() = id);
 
 CREATE POLICY "Users can insert their own profile" ON public.profiles
   FOR INSERT WITH CHECK (auth.uid() = id);
@@ -59,8 +59,32 @@ CREATE TABLE public.nodes (
 
 ALTER TABLE public.nodes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Individuals can manage their own nodes" ON public.nodes
-  USING (
+CREATE POLICY "Individuals can view their own nodes" ON public.nodes
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.diagrams
+      WHERE diagrams.id = nodes.diagram_id AND diagrams.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Individuals can insert their own nodes" ON public.nodes
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.diagrams
+      WHERE diagrams.id = nodes.diagram_id AND diagrams.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Individuals can update their own nodes" ON public.nodes
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM public.diagrams
+      WHERE diagrams.id = nodes.diagram_id AND diagrams.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Individuals can delete their own nodes" ON public.nodes
+  FOR DELETE USING (
     EXISTS (
       SELECT 1 FROM public.diagrams
       WHERE diagrams.id = nodes.diagram_id AND diagrams.user_id = auth.uid()
@@ -78,8 +102,32 @@ CREATE TABLE public.edges (
 
 ALTER TABLE public.edges ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Individuals can manage their own edges" ON public.edges
-  USING (
+CREATE POLICY "Individuals can view their own edges" ON public.edges
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.diagrams
+      WHERE diagrams.id = edges.diagram_id AND diagrams.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Individuals can insert their own edges" ON public.edges
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.diagrams
+      WHERE diagrams.id = edges.diagram_id AND diagrams.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Individuals can update their own edges" ON public.edges
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM public.diagrams
+      WHERE diagrams.id = edges.diagram_id AND diagrams.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Individuals can delete their own edges" ON public.edges
+  FOR DELETE USING (
     EXISTS (
       SELECT 1 FROM public.diagrams
       WHERE diagrams.id = edges.diagram_id AND diagrams.user_id = auth.uid()

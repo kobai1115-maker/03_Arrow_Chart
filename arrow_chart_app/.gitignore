@@ -22,4 +22,7 @@ Desktop.ini
 noto_extracted/
 
 # Security Data
-lib/constants/supabase_constants.dart
+# ※ supabase_constants.dart は --dart-define 方式に移行済み
+# ※ シークレットはソースに含まれないため .gitignore から除外
+.env
+.env.local
